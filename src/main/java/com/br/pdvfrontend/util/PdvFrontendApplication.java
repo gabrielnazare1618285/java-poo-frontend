@@ -1,22 +1,24 @@
-package com.br.pdvfrontend;
+package com.br.pdvfrontend.util;
 
 import com.br.pdvfrontend.view.PessoaView;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.context.ConfigurableApplicationContext;
 
 import java.awt.EventQueue;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "com.br.pdvfrontend")
 public class PdvFrontendApplication implements CommandLineRunner {
+
+    @Autowired
+    private PessoaView pessoaView;
 
     public static void main(String[] args) {
         // Configura o Spring para rodar em modo "headless=false", permitindo UI (Swing/AWT)
-        // e define que não é uma aplicação web para não iniciar o Tomcat.
         SpringApplicationBuilder builder = new SpringApplicationBuilder(PdvFrontendApplication.class);
         builder.headless(false);
-        ConfigurableApplicationContext context = builder.run(args);
+        builder.run(args);
     }
 
     @Override
@@ -24,8 +26,7 @@ public class PdvFrontendApplication implements CommandLineRunner {
         // Este método é executado após o Spring iniciar
         // Usamos EventQueue.invokeLater para garantir que a UI seja criada na thread correta (Event Dispatch Thread)
         EventQueue.invokeLater(() -> {
-            // Pega a instância da nossa view (que é um @Component) do contexto do Spring
-            PessoaView pessoaView = SpringApplication.run(PdvFrontendApplication.class, args).getBean(PessoaView.class);
+            // Usa a instância da view injetada pelo Spring
             pessoaView.setVisible(true);
         });
     }
