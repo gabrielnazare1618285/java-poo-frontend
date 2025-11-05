@@ -1,6 +1,8 @@
 package com.br.pdvfrontend.service;
 
 import com.br.pdvfrontend.model.Pessoa;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -10,33 +12,38 @@ import java.util.List;
 @Service
 public class PessoaService {
 
-    // URL base da sua API backend. Altere se for diferente.
-    private final String API_URL = "http://localhost:8080/pessoas";
-
+    private final String BASE_URL = "http://localhost:8080/api/v1/pessoas";
     private final RestTemplate restTemplate;
 
-    public PessoaService() {
-        this.restTemplate = new RestTemplate();
+    @Autowired
+    public PessoaService(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
     }
 
-    public List<Pessoa> listarTodos() {
-        // Faz uma requisição GET para /pessoas e espera um array de Pessoa
-        Pessoa[] pessoas = restTemplate.getForObject(API_URL, Pessoa[].class);
-        return Arrays.asList(pessoas);
+    public List<Pessoa> listar() {
+        ResponseEntity<Pessoa[]> response = restTemplate.getForEntity(BASE_URL, Pessoa[].class);
+        if (response.getBody() != null) {
+            return Arrays.asList(response.getBody());
+        }
+        return List.of(); // Retorna lista vazia se a resposta for nula
+    }
+
+    public Pessoa buscarPorId(Long id) {
+        String url = BASE_URL + "/" + id;
+        ResponseEntity<Pessoa> response = restTemplate.getForEntity(url, Pessoa.class);
+        return response.getBody();
     }
 
     public Pessoa salvar(Pessoa pessoa) {
-        // Faz uma requisição POST para /pessoas, enviando o objeto pessoa no corpo
-        return restTemplate.postForObject(API_URL, pessoa, Pessoa.class);
+        ResponseEntity<Pessoa> response = restTemplate.postForEntity(BASE_URL, pessoa, Pessoa.class);
+        return response.getBody();
     }
 
     public void atualizar(Pessoa pessoa) {
-        // Faz uma requisição PUT para /pessoas/{id}
-        restTemplate.put(API_URL + "/" + pessoa.getId(), pessoa);
+        restTemplate.put(BASE_URL + "/" + pessoa.getId(), pessoa);
     }
 
     public void deletar(Long id) {
-        // Faz uma requisição DELETE para /pessoas/{id}
-        restTemplate.delete(API_URL + "/" + id);
+        restTemplate.delete(BASE_URL + "/" + id);
     }
 }
