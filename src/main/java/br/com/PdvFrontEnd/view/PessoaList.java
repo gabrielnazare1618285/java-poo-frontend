@@ -1,4 +1,4 @@
-package com.br.pdvfrontend.view;
+package br.com.PdvFrontEnd.view;
 
 import com.br.pdvfrontend.model.Pessoa;
 import com.br.pdvfrontend.service.PessoaService;

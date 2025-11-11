@@ -1,4 +1,4 @@
-package com.br.pdvfrontend.view;
+package br.com.PdvFrontEnd.view;
 
 import javax.swing.*;
 import java.awt.*;
@@ -27,7 +27,7 @@ public class MainApp {
 
             // Se não existir usuário cadastrado, abre a tela de cadastro
             if (!sessionManager.userExists()) {
-                new RegisterView().setVisible(true);
+                new br.com.PdvFrontEnd.view.RegisterView().setVisible(true);
             } else {
                 new LoginView().setVisible(true);
             }

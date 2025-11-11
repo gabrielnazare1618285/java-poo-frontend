@@ -1,4 +1,4 @@
-package com.br.pdvfrontend.model;
+package br.com.PdvFrontEnd.model;
 
 public class Pessoa {
     private Long id;

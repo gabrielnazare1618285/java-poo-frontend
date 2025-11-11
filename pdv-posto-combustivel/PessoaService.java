@@ -1,10 +1,10 @@
 package br.com.PdvFrontEnd.service;
 
+import br.com.PdvFrontEnd.dto.PageResponse;
+import br.com.PdvFrontEnd.dto.PessoaRequest;
+import br.com.PdvFrontEnd.dto.PessoaResponse;
 import br.com.PdvFrontEnd.model.Pessoa;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import br.com.PdvFrontEnd.util.HttpClient;
 
 import javax.swing.*;
 import java.time.LocalDate;

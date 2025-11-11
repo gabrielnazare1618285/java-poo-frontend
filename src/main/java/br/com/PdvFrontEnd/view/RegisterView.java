@@ -1,7 +1,7 @@
-package com.br.pdvfrontend.view;
+package br.com.PdvFrontEnd.view;
 
-import com.br.pdvfrontend.model.Pessoa;
-import com.br.pdvfrontend.service.PessoaService;
+import br.com.PdvFrontEnd.model.Pessoa;
+import br.com.PdvFrontEnd.service.PessoaService;
 import org.springframework.stereotype.Component;
 
 import javax.swing.*;

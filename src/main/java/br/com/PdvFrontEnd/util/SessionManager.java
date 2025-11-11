@@ -1,4 +1,4 @@
-package com.br.pdvfrontend.util;
+package br.com.PdvFrontEnd.util;
 
 import java.io.*;
 import java.util.Properties;
