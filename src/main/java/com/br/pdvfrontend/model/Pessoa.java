@@ -1,17 +1,30 @@
 package com.br.pdvfrontend.model;
 
-// Usaremos esta classe para enviar e receber dados da API (um DTO - Data Transfer Object)
 public class Pessoa {
-
     private Long id;
     private String nome;
     private String cpf;
-    private String email;
-    private String telefone;
-    private String endereco;
+    private String dataNascimento;
+    private String tipo;
+    private String funcao;
 
-    // Construtor vazio é necessário para a desserialização do JSON
     public Pessoa() {
+    }
+
+    public Pessoa(Long id, String nome, String cpf, String dataNascimento, String tipo) {
+        this.id = id;
+        this.nome = nome;
+        this.cpf = cpf;
+        this.dataNascimento = dataNascimento;
+        this.tipo = tipo;
+    }
+
+    // Construtor sem o ID (usado no front)
+    public Pessoa(String nome, String cpf, String dataNascimento, String tipo) {
+        this.nome = nome;
+        this.cpf = cpf;
+        this.dataNascimento = dataNascimento;
+        this.tipo = tipo;
     }
 
     // Getters e Setters
@@ -27,45 +40,41 @@ public class Pessoa {
         return nome;
     }
 
+    public String getNomeCompleto() {
+        return nome;
+    }
+
     public void setNome(String nome) {
         this.nome = nome;
     }
 
-    public String getCpf() {
-        return cpf;
-    }
+    public String getCpf() {return cpf; }
 
     public void setCpf(String cpf) {
         this.cpf = cpf;
     }
 
-    public String getEmail() {
-        return email;
+    public String getDataNascimento() {
+        return dataNascimento;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setDataNascimento(String dataNascimento) {
+        this.dataNascimento = dataNascimento;
     }
 
-    public String getTelefone() {
-        return telefone;
+    public String getTipo() {
+        return tipo;
     }
 
-    public void setTelefone(String telefone) {
-        this.telefone = telefone;
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
     }
 
-    public String getEndereco() {
-        return endereco;
+    public String getFuncao() {
+        return funcao != null ? funcao : tipo;
     }
 
-    public void setEndereco(String endereco) {
-        this.endereco = endereco;
-    }
-
-    // Sobrescrevendo o toString para facilitar a exibição
-    @Override
-    public String toString() {
-        return getNome();
+    public void setFuncao(String funcao) {
+        this.funcao = funcao;
     }
 }

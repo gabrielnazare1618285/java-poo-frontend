@@ -1,0 +1,194 @@
+package com.br.pdvfrontend.view;
+
+import com.br.pdvfrontend.model.Preco;
+import com.br.pdvfrontend.service.PrecoService;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import javax.swing.border.EmptyBorder;
+import java.util.List;
+
+public class PrecoList extends JFrame {
+    private final transient PrecoService precoService;
+    private JTable table;
+
+    // Cores para a nova interface
+    private static final Color PRIMARY_COLOR = new Color(220, 20, 60);
+    private static final Color SECONDARY_COLOR = new Color(30, 30, 30);
+    private static final Color TEXT_COLOR = Color.WHITE;
+    private static final Color BACKGROUND_COLOR = new Color(250, 250, 250);
+    private static final Color TABLE_HEADER_COLOR = new Color(30, 30, 30);
+    private static final Color TABLE_SELECTION_COLOR = new Color(220, 20, 60);
+    private static final Color BUTTON_HOVER_COLOR = new Color(180, 15, 50);
+
+    public PrecoList(PrecoService service) {
+        this.precoService = service;
+        initComponents();
+    }
+
+    private void initComponents() {
+        setTitle("Gerenciamento de Preços");
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        setSize(1000, 550);
+        setLocationRelativeTo(null);
+
+        JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
+        mainPanel.setBackground(BACKGROUND_COLOR);
+        mainPanel.setBorder(new EmptyBorder(15, 15, 15, 15));
+
+        mainPanel.add(createHeader(), BorderLayout.NORTH);
+        mainPanel.add(createTablePanel(), BorderLayout.CENTER);
+        mainPanel.add(createButtonPanel(), BorderLayout.SOUTH);
+
+        add(mainPanel);
+
+        atualizarTabela();
+    }
+
+    private JLabel createHeader() {
+        JLabel header = new JLabel("GERENCIAMENTO DE PREÇOS", SwingConstants.CENTER);
+        header.setFont(new Font("Arial Black", Font.BOLD, 22));
+        header.setOpaque(true);
+        header.setBackground(PRIMARY_COLOR);
+        header.setForeground(TEXT_COLOR);
+        header.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(SECONDARY_COLOR, 3),
+                new EmptyBorder(15, 0, 15, 0)
+        ));
+        return header;
+    }
+
+    private JPanel createTablePanel() {
+        JPanel tablePanel = new JPanel(new BorderLayout());
+        tablePanel.setBackground(Color.WHITE);
+        tablePanel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(SECONDARY_COLOR, 2),
+                new EmptyBorder(10, 10, 10, 10)
+        ));
+
+        table = new JTable();
+        table.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        table.setRowHeight(28);
+        table.setGridColor(BACKGROUND_COLOR);
+        table.setSelectionBackground(TABLE_SELECTION_COLOR);
+        table.setSelectionForeground(TEXT_COLOR);
+        table.getTableHeader().setBackground(TABLE_HEADER_COLOR);
+        table.getTableHeader().setForeground(TEXT_COLOR);
+        table.getTableHeader().setFont(new Font("Segoe UI Semibold", Font.BOLD, 14));
+
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        tablePanel.add(scrollPane, BorderLayout.CENTER);
+
+        return tablePanel;
+    }
+
+    private JPanel createButtonPanel() {
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        buttonPanel.setBackground(SECONDARY_COLOR);
+
+        JButton btnAdicionar = criarBotao("Adicionar");
+        btnAdicionar.addActionListener(e -> {
+            PrecoForm form = new PrecoForm(precoService, this);
+            form.setVisible(true);
+        });
+
+        JButton btnEditar = criarBotao("Editar");
+        btnEditar.addActionListener(e -> editarPreco());
+
+        JButton btnRemover = criarBotao("Remover");
+        btnRemover.addActionListener(e -> removerPreco());
+
+        JButton btnAtualizar = criarBotao("Atualizar");
+        btnAtualizar.addActionListener(e -> atualizarTabela());
+
+        buttonPanel.add(btnAdicionar);
+        buttonPanel.add(btnEditar);
+        buttonPanel.add(btnRemover);
+        buttonPanel.add(btnAtualizar);
+
+        return buttonPanel;
+    }
+
+    private JButton criarBotao(String texto) {
+        JButton btn = new JButton(texto);
+        btn.setBackground(PRIMARY_COLOR);
+        btn.setForeground(TEXT_COLOR);
+        btn.setFont(new Font("Arial", Font.BOLD, 13));
+        btn.setFocusPainted(false);
+        btn.setOpaque(true);
+        btn.setContentAreaFilled(true);
+        btn.setBorderPainted(true);
+        btn.setBorder(new EmptyBorder(10, 20, 10, 20));
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        // Força a atualização visual
+        btn.setUI(new javax.swing.plaf.basic.BasicButtonUI());
+
+        btn.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                btn.setBackground(BUTTON_HOVER_COLOR);
+            }
+
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                btn.setBackground(PRIMARY_COLOR);
+            }
+        });
+        return btn;
+    }
+
+    private void editarPreco() {
+        int selectedRow = table.getSelectedRow();
+        if (selectedRow != -1) {
+            List<Preco> precos = precoService.getAllPrecos();
+            if (selectedRow < precos.size()) {
+                Preco preco = precos.get(selectedRow);
+                if (preco.getId() != null) {
+                    PrecoForm form = new PrecoForm(precoService, this, preco);
+                    form.setVisible(true);
+                } else {
+                    JOptionPane.showMessageDialog(this, "Preço não possui ID válido!");
+                }
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Selecione um preço para editar.", "Aviso", JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
+    private void removerPreco() {
+        int selectedRow = table.getSelectedRow();
+        if (selectedRow != -1) {
+            List<Preco> precos = precoService.getAllPrecos();
+            if (selectedRow < precos.size()) {
+                Preco preco = precos.get(selectedRow);
+                if (preco.getId() != null) {
+                    precoService.removePreco(preco.getId());
+                    atualizarTabela();
+                } else {
+                    JOptionPane.showMessageDialog(this, "Preço não possui ID válido!");
+                }
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Selecione um preço para remover.", "Aviso", JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
+    public void atualizarTabela() {
+        String[] colunas = {"Valor", "Data de Alteração", "Hora de Alteração"};
+        DefaultTableModel model = new DefaultTableModel(colunas, 0);
+
+        List<Preco> precos = precoService.getAllPrecos();
+        for (Preco preco : precos) {
+            model.addRow(new Object[]{
+                    preco.getValor(),
+                    preco.getDataAlteracao(),
+                    preco.getHoraAlteracao()
+            });
+        }
+
+        table.setModel(model);
+    }
+}

@@ -1,42 +1,144 @@
 package com.br.pdvfrontend.service;
 
+import com.br.pdvfrontend.dto.PageResponse;
+import com.br.pdvfrontend.dto.PessoaRequest;
+import com.br.pdvfrontend.dto.PessoaResponse;
 import com.br.pdvfrontend.model.Pessoa;
-import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import com.br.pdvfrontend.util.HttpClient;
 
-import java.util.Arrays;
+import javax.swing.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
-@Service
 public class PessoaService {
 
-    // URL base da sua API backend. Altere se for diferente.
-    private final String API_URL = "http://localhost:8080/pessoas";
-
-    private final RestTemplate restTemplate;
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private static final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
     public PessoaService() {
-        this.restTemplate = new RestTemplate();
     }
 
-    public List<Pessoa> listarTodos() {
-        // Faz uma requisição GET para /pessoas e espera um array de Pessoa
-        Pessoa[] pessoas = restTemplate.getForObject(API_URL, Pessoa[].class);
-        return Arrays.asList(pessoas);
+    public List<Pessoa> listPessoas() {
+        try {
+            TypeReference<PageResponse<PessoaResponse>> typeRef = new TypeReference<>() {};
+            PageResponse<PessoaResponse> pageResponse = HttpClient.get("/v1/pessoas?size=1000", typeRef);
+
+            List<Pessoa> pessoas = new ArrayList<>();
+            for (PessoaResponse pessoaResponse : pageResponse.getContent()) {
+                Pessoa pessoa = new Pessoa();
+                pessoa.setId(pessoaResponse.getId());
+                pessoa.setNome(pessoaResponse.getNomeCompleto());
+                pessoa.setCpf(pessoaResponse.getCpfCnpj());
+                pessoa.setDataNascimento(pessoaResponse.getDataNascimento() != null ?
+                        pessoaResponse.getDataNascimento().toString() : "");
+                pessoa.setTipo(pessoaResponse.getTipoPessoa() != null ?
+                        pessoaResponse.getTipoPessoa() : "");
+                pessoas.add(pessoa);
+            }
+            return pessoas;
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null,
+                    "Erro ao listar pessoas: " + e.getMessage(),
+                    "Erro",
+                    JOptionPane.ERROR_MESSAGE);
+            return new ArrayList<>();
+        }
     }
 
-    public Pessoa salvar(Pessoa pessoa) {
-        // Faz uma requisição POST para /pessoas, enviando o objeto pessoa no corpo
-        return restTemplate.postForObject(API_URL, pessoa, Pessoa.class);
+    public void addPessoa(Pessoa pessoa) {
+        try {
+            PessoaRequest request = new PessoaRequest();
+            request.setNomeCompleto(pessoa.getNome());
+            request.setCpfCnpj(pessoa.getCpf());
+
+            if (pessoa.getDataNascimento() != null && !pessoa.getDataNascimento().isEmpty()) {
+                request.setDataNascimento(LocalDate.parse(pessoa.getDataNascimento(), DATE_FORMATTER));
+            }
+
+            request.setTipoPessoa(pessoa.getTipo().toUpperCase());
+
+            HttpClient.post("/v1/pessoas", request, PessoaResponse.class);
+            JOptionPane.showMessageDialog(null,
+                    "Pessoa adicionada com sucesso!",
+                    "Sucesso",
+                    JOptionPane.INFORMATION_MESSAGE);
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null,
+                    "Erro ao adicionar pessoa: " + e.getMessage(),
+                    "Erro",
+                    JOptionPane.ERROR_MESSAGE);
+        }
     }
 
-    public void atualizar(Pessoa pessoa) {
-        // Faz uma requisição PUT para /pessoas/{id}
-        restTemplate.put(API_URL + "/" + pessoa.getId(), pessoa);
+    public void removePessoa(Long id) {
+        try {
+            HttpClient.delete("/v1/pessoas/" + id);
+            JOptionPane.showMessageDialog(null,
+                    "Pessoa removida com sucesso!",
+                    "Sucesso",
+                    JOptionPane.INFORMATION_MESSAGE);
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null,
+                    "Erro ao remover pessoa: " + e.getMessage(),
+                    "Erro",
+                    JOptionPane.ERROR_MESSAGE);
+        }
     }
 
-    public void deletar(Long id) {
-        // Faz uma requisição DELETE para /pessoas/{id}
-        restTemplate.delete(API_URL + "/" + id);
+    public void updatePessoa(Long id, Pessoa pessoa) {
+        try {
+            PessoaRequest request = new PessoaRequest();
+            request.setNomeCompleto(pessoa.getNome());
+            request.setCpfCnpj(pessoa.getCpf());
+
+            if (pessoa.getDataNascimento() != null && !pessoa.getDataNascimento().isEmpty()) {
+                request.setDataNascimento(LocalDate.parse(pessoa.getDataNascimento(), DATE_FORMATTER));
+            }
+
+            request.setTipoPessoa(pessoa.getTipo().toUpperCase());
+
+            HttpClient.put("/v1/pessoas/" + id, request, PessoaResponse.class);
+            JOptionPane.showMessageDialog(null,
+                    "Pessoa atualizada com sucesso!",
+                    "Sucesso",
+                    JOptionPane.INFORMATION_MESSAGE);
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null,
+                    "Erro ao atualizar pessoa: " + e.getMessage(),
+                    "Erro",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    public List<Pessoa> getAllPessoas() {
+        try {
+            TypeReference<PageResponse<PessoaResponse>> typeRef = new TypeReference<>() {};
+            PageResponse<PessoaResponse> pageResponse = HttpClient.get("/v1/pessoas?size=1000", typeRef);
+
+            List<Pessoa> pessoas = new ArrayList<>();
+            for (PessoaResponse pessoaResponse : pageResponse.getContent()) {
+                Pessoa pessoa = new Pessoa();
+                pessoa.setId(pessoaResponse.getId());
+                pessoa.setNome(pessoaResponse.getNomeCompleto());
+                pessoa.setCpf(pessoaResponse.getCpfCnpj());
+                pessoa.setDataNascimento(pessoaResponse.getDataNascimento() != null ?
+                        pessoaResponse.getDataNascimento().toString() : "");
+                pessoa.setTipo(pessoaResponse.getTipoPessoa() != null ?
+                        pessoaResponse.getTipoPessoa() : "");
+                pessoas.add(pessoa);
+            }
+            return pessoas;
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao carregar pessoas: " + e.getMessage(), e);
+        }
     }
 }
