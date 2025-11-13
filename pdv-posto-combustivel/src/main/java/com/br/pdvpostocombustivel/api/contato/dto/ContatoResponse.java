@@ -1,20 +1,31 @@
-package  com.br.pdvpostocombustivel.api.contato.dto;
+package com.br.pdvfrontend.model;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-
-@Schema(description = "DTO para resposta de Contato")
-public class ContatoResponse {
-    @Schema(description = "ID do contato")
+public class Pessoa {
     private Long id;
+    private String nome;
+    private String cpf;
+    private String dataNascimento;
+    private String tipo;
+    private String funcao;
 
-    @Schema(description = "Número de telefone", example = "(11) 99999-8888")
-    private String telefone;
+    public Pessoa() {
+    }
 
-    @Schema(description = "Endereço de email", example = "usuario@email.com")
-    private String email;
+    public Pessoa(Long id, String nome, String cpf, String dataNascimento, String tipo) {
+        this.id = id;
+        this.nome = nome;
+        this.cpf = cpf;
+        this.dataNascimento = dataNascimento;
+        this.tipo = tipo;
+    }
 
-    @Schema(description = "Endereço físico", example = "Rua Example, 123")
-    private String endereco;
+    // Construtor sem o ID (usado no front)
+    public Pessoa(String nome, String cpf, String dataNascimento, String tipo) {
+        this.nome = nome;
+        this.cpf = cpf;
+        this.dataNascimento = dataNascimento;
+        this.tipo = tipo;
+    }
 
     // Getters e Setters
     public Long getId() {
@@ -25,27 +36,45 @@ public class ContatoResponse {
         this.id = id;
     }
 
-    public String getTelefone() {
-        return telefone;
+    public String getNome() {
+        return nome;
     }
 
-    public void setTelefone(String telefone) {
-        this.telefone = telefone;
+    public String getNomeCompleto() {
+        return nome;
     }
 
-    public String getEmail() {
-        return email;
+    public void setNome(String nome) {
+        this.nome = nome;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public String getCpf() {return cpf; }
+
+    public void setCpf(String cpf) {
+        this.cpf = cpf;
     }
 
-    public String getEndereco() {
-        return endereco;
+    public String getDataNascimento() {
+        return dataNascimento;
     }
 
-    public void setEndereco(String endereco) {
-        this.endereco = endereco;
+    public void setDataNascimento(String dataNascimento) {
+        this.dataNascimento = dataNascimento;
+    }
+
+    public String getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
+    }
+
+    public String getFuncao() {
+        return funcao != null ? funcao : tipo;
+    }
+
+    public void setFuncao(String funcao) {
+        this.funcao = funcao;
     }
 }
